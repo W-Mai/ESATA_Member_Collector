@@ -19,23 +19,30 @@ TargetData = [[[],[],[],[],[],[],[]],
 def LoadData():
     totalFile = len(files)
     fileCounter = 0
-    for fileName in files:
-        fileCounter += 1
-        wb = openpyxl.load_workbook(DATAPATH + fileName)  
-        sheet = wb['Main']
+
+    try:
+        for fileName in files:
+            fileCounter += 1
+            wb = openpyxl.load_workbook(DATAPATH + fileName)  
+            sheet = wb['Main']
     
-        name = sheet.cell(row=11, column=3).value           # 读名字
-        class_ = sheet.cell(row=12, column=3).value          # 读班级
+            name = sheet.cell(row=11, column=3).value            # 读名字
+            class_ = sheet.cell(row=12, column=3).value          # 读班级
     
-        print(f">>> Analysis Process : {fileCounter / totalFile:>7.2%} - {name:5}  {class_}")
+            print(f">>> Analysis Process : {fileCounter / totalFile:>7.2%} - {name:5}  {class_}")
     
-        for i in range(6):
-            for j in range(7):
-                # 取出每一格数据
-                tmpVal = sheet.cell(row=4 + i, column=3 + j).value
-                # 如果是0或者没有填也就是没有课，加入缓冲区
-                if  not(tmpVal != None and tmpVal > 0):
-                    TargetData[i][j].append(name)
+            for i in range(6):
+                for j in range(7):
+                    # 取出每一格数据
+                    tmpVal = sheet.cell(row=4 + i, column=3 + j).value
+                    # 如果是0或者没有填也就是没有课，加入缓冲区
+                    if  not(tmpVal != None and tmpVal > 0):
+                        TargetData[i][j].append(name)
+    except Exception as e:
+        print(f"\n!!!   Exception File: [ {fileName} ]\n!!!   Location:       [ {sheet.cell(row=4 + i, column=3 + j)} ]\n" )
+        print("EXCEPTION: ",str(e),"\n")
+        exit(0)
+
     return fileCounter, fileName, totalFile
 
 # 将数据从内存中写入到磁盘
